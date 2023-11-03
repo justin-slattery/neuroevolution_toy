@@ -27,6 +27,8 @@ class Brain:
         self.network.randomize_outputs(.1, .2)
 
     def step(self):
+        self.hist_outputs = list(self.hist_outputs)
+
         # Step through network
         for _ in range(int(self.run_duration/self.step_size)):
             self.network.euler_step([0]*self.net_size) # zero external_inputs
@@ -36,7 +38,7 @@ class Brain:
     def plot(self):
         # Plot oscillator output
         plt.plot(np.arange(0, self.run_duration, self.step_size), self.hist_outputs[:,0])
-        plt.plot(np.arange(0, self.run_duration, self.step_size), self.hist_outputs[:,1])
+        #plt.plot(np.arange(0, self.run_duration, self.step_size), self.hist_outputs[:,1])
         plt.xlabel('Time')
         plt.ylabel('Neuron outputs')
         plt.show()
