@@ -1,10 +1,8 @@
 '''
 Main class for running the genetic algorithm, the simulation, and recording/plotting the results.
 '''
-
 from GA import GeneticAlgorithm
 from Agent import Agent
-from Brain import Brain
 from Target import Target
 from scipy.sparse import csr_matrix
 from mpl_toolkits.mplot3d import Axes3D
@@ -52,7 +50,7 @@ DATA_DIR                =       str(config['DEFAULT']['DATA_DIR'])
 # Run the GA-driven simulation
 def fitness_function(agent, target):
     # Run the simulation for a fixed number of steps
-    for step in range(RUN_DURATION):
+    for _ in range(RUN_DURATION):
         agent.update(target_position=target.position)
         
         # Check if the agent has reached the target
@@ -77,17 +75,16 @@ ga = GeneticAlgorithm(
 )
 
 # Run the genetic algorithm
-best_brain = ga.step(num_generations=GENERATIONS)  # Assumes ga.step returns the best brain
-
-# Instantiate the best agent using the best brain
-best_agent = Agent(brain=best_brain)
+best_agent = ga.step(num_generations=GENERATIONS)  # Assumes ga.step returns the best brain
 
 # Run the simulation for the best agent for visualization
-for step in range(RUN_DURATION):
+for run in range(RUN_DURATION):
     best_agent.update(target_position=target.position)
-    if np.linalg.norm(best_agent.position - target.position) < THRESHOLD:
+    if np.linalg.norm(best_agent.position - target.position) <= THRESHOLD:
         print("Best agent reached the target!")
         break
+    elif run == (RUN_DURATION-1) and (not np.linalg.norm(best_agent.position - target.position) <= THRESHOLD):
+        print(f"Distance to object: {np.linalg.norm(best_agent.position - target.position)}")
 
 # Plot the best trajectory using the trajectory data from the best agent
 trajectory = np.array(best_agent.trajectory)  # Convert to numpy array for easy slicing

@@ -1,12 +1,6 @@
 '''
 Main class for creating the Genetic Algorithm and its required components.
 '''
-
-from copy import deepcopy
-from Brain import Brain
-from Agent import Agent
-import numpy as np
-
 from copy import deepcopy
 from Agent import Agent
 import numpy as np

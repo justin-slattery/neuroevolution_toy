@@ -1,8 +1,6 @@
 '''
 Main class for creating the Brain object and updating its properties.
 '''
-
-# # Generates the code for the agent brain
 from CTRNN import CTRNN
 from scipy.sparse import csr_matrix
 import numpy as np
@@ -55,7 +53,7 @@ class Brain:
 
     def plot(self):
         # Plot oscillator output
-        plt.plot(np.arange(0, self.run_duration, self.step_size), self.hist_outputs[:,0])
+        #plt.plot(np.arange(0, self.run_duration, self.step_size), self.hist_outputs[:,0])
         #plt.plot(np.arange(0, self.run_duration, self.step_size), self.hist_outputs[:,1])
         plt.xlabel('Time')
         plt.ylabel('Neuron outputs')

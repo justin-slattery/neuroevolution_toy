@@ -1,10 +1,9 @@
 '''
 Main class for creating the Agent object and updating its properties.
 '''
-
-import numpy as np
 from Brain import Brain
 from Cast import RayCaster3D
+import numpy as np
 
 import configparser
 config = configparser.ConfigParser()
