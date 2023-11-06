@@ -1,13 +1,17 @@
+'''
+Main class for creating the Genetic Algorithm and its required components.
+'''
+
 from copy import deepcopy
 from Brain import Brain
 import numpy as np
 
 class GeneticAlgorithm:
-    def __init__(self, fitness_function, population_size, mutation_prob, mutation_strength, elite_size_ratio):
+    def __init__(self, fitness_function, population_size, mutation_prob, mutation_strength, elitism_fraction):
         self.population_size = population_size
         self.mutation_prob = mutation_prob
         self.mutation_strength = mutation_strength
-        self.elite_size = int(elite_size_ratio * population_size)
+        self.elite_size = int(elitism_fraction * population_size)
         self.population = [Brain() for _ in range(population_size)]
         self.fitness_function = fitness_function
         self.fitnesses = np.zeros(population_size)
