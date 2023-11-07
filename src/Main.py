@@ -50,14 +50,11 @@ DATA_DIR                =       str(config['DEFAULT']['DATA_DIR'])
 # Run the GA-driven simulation
 def fitness_function(agent, target):
     # Run the simulation for a fixed number of steps
-    for _ in range(RUN_DURATION):
+    for step in range(RUN_DURATION):
         agent.update(target_position=target.position)
+        if agent.has_reached_target:
+            step = RUN_DURATION  # End the simulation early if the target is reached
         
-        # Check if the agent has reached the target
-        if np.linalg.norm(agent.position - target.position) < THRESHOLD:
-            # If the agent reaches the target, you can break early or assign bonus fitness
-            break
-    
     # Fitness is inversely related to the distance to the target at the last step
     fitness = 1.0 / (np.linalg.norm(agent.position - target.position) + 1e-5)
     
@@ -80,10 +77,7 @@ best_agent = ga.step(num_generations=GENERATIONS)  # Assumes ga.step returns the
 # Run the simulation for the best agent for visualization
 for run in range(RUN_DURATION):
     best_agent.update(target_position=target.position)
-    if np.linalg.norm(best_agent.position - target.position) <= THRESHOLD:
-        print("Best agent reached the target!")
-        break
-    elif run == (RUN_DURATION-1) and (not np.linalg.norm(best_agent.position - target.position) <= THRESHOLD):
+    if run == (RUN_DURATION-1) and (not np.linalg.norm(best_agent.position - target.position) <= THRESHOLD):
         print(f"Distance to object: {np.linalg.norm(best_agent.position - target.position)}")
 
 # Plot the best trajectory using the trajectory data from the best agent
@@ -92,6 +86,12 @@ trajectory = np.array(best_agent.trajectory)  # Convert to numpy array for easy 
 # Create a 3D plot
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
+
+# Plot environment boundaries (assuming they are from -10 to 10 in X and Y)
+x_bounds, y_bounds = [-10, 10], [-10, 10]
+ax.plot([x_bounds[0], x_bounds[1], x_bounds[1], x_bounds[0], x_bounds[0]],
+        [y_bounds[0], y_bounds[0], y_bounds[1], y_bounds[1], y_bounds[0]],
+        [0, 0, 0, 0, 0], 'gray', linestyle='--')  # Flat square on the ground
 
 # Plot the trajectory as a line
 ax.plot(trajectory[:, 0], trajectory[:, 1], trajectory[:, 2], label='Agent Path')
