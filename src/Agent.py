@@ -44,7 +44,7 @@ class Agent:
         # Check if the target is reached and stop further updates
         if np.linalg.norm(self.position - target_position) < THRESHOLD:
             self.has_reached_target = True
-            print("Reached the target!")
+            #print("Reached the target!")
             return  # End the update early
         
         if self.has_reached_target:
