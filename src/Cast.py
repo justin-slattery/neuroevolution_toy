@@ -36,7 +36,8 @@ class RayCaster3D:
     def cast_rays(self, target_position):
         # Cast rays towards the target and determine if they hit
         hits = np.zeros(self.horizontal_rays, dtype=bool)
-        distances = np.full(self.horizontal_rays, self.max_distance)
+        # Initialize distances to zero to indicate no detection
+        distances = np.zeros(self.horizontal_rays)
         target_vector = target_position - self.position
         target_distance = np.linalg.norm(target_vector)
 
@@ -46,9 +47,11 @@ class RayCaster3D:
                 angle_diff = self.angle_between(target_vector, ray_direction)
                 if angle_diff <= np.radians(self.horizontal_fov / 2):
                     hits[j] = True
-                    distances[j] = target_distance
+                    # Normalize distance to [0, 1]
+                    distances[j] = target_distance / self.max_distance
 
         return hits, distances
+
 
     # Additional methods can be added here for more complex behaviors and interactions.
 

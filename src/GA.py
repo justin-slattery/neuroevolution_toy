@@ -11,11 +11,38 @@ class GeneticAlgorithm:
         self.mutation_prob = mutation_prob
         self.mutation_strength = mutation_strength
         self.elite_size = int(elitism_fraction * population_size)
-        self.population = [Agent() for _ in range(population_size)]  # Initialize the population with Agent objects
+        self.population = []  # Initialize the population with Agent objects
         self.fitness_function = fitness_function  # Fitness function that evaluates an Agent
         self.fitnesses = np.zeros(population_size)
         self.best_fitness = -np.inf
         self.best_individual = None  # This will store the best Agent object
+
+    def populate(self):
+        # Initialize agents and constrain weights
+        # brains get created with agent initialization
+        for _ in range(self.population_size):
+            agent = Agent()
+            # Assign/Constrain Weights
+            for i in range(agent.brain.net_size):
+                for j in range(agent.brain.net_size):
+                    # Prevent input-to-output connections
+                    if i < agent.brain.input_size and j > agent.brain.net_size-agent.brain.output_size-1:
+                        agent.brain.network.weights[i, j] = 0.0001
+                    # Prevent output-to-input connections
+                    elif i > agent.brain.input_size-1 and j < agent.brain.net_size-agent.brain.output_size:
+                        agent.brain.network.weights[i, j] = 0.0001
+                    else:
+                        agent.brain.network.weights[i, j] = np.random.uniform(-5., 5.)
+                        while agent.brain.network.weights[i, j] == 0.0:
+                            agent.brain.network.weights[i, j] = np.random.uniform(-5., 5.)
+            # Assign Taus
+            for i in range(agent.brain.net_size):
+                agent.brain.network.taus[i] = 1.0
+            # Assign biases
+            for i in range(agent.brain.net_size):
+                agent.brain.network.biases[i] = np.random.uniform(-2.5, 2.5)
+
+            self.population.append(agent)
 
     def evaluate_fitness(self):
         for i, agent in enumerate(self.population):
@@ -58,6 +85,8 @@ class GeneticAlgorithm:
         self.population = next_generation
 
     def step(self, num_generations):
+        # Populate the initial population with constrained NN params
+        self.populate()
         for generation in range(num_generations):
             # Reset each agent before evaluation
             for agent in self.population:

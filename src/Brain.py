@@ -29,13 +29,11 @@ class Brain:
         self.step_size = step_size
         # Initializes the CTRNN
         self.network = CTRNN(size=self.net_size, step_size=self.step_size)
-        self.hist_outputs = []
+        self.final_outputs = []
         # Initializes the network
         self.network.randomize_outputs(0.1, 0.2)
 
     def step(self, external_inputs):
-        self.hist_outputs = list(self.hist_outputs)
-
         # Ensure external_inputs is only for input neurons
         if len(external_inputs) != self.input_size:
             raise ValueError(f"Expected external inputs of length {self.input_size}, got {len(external_inputs)}")
@@ -46,10 +44,32 @@ class Brain:
         # Step through network
         for _ in range(int(self.run_duration / self.step_size)):
             self.network.euler_step(network_inputs)  # Pass the network inputs to the CTRNN
+            # 11/7/2023
+            # Neuron has 13 neurons but only 3 outputs
+            # 0-9 are input neurons
+            self.network.outputs[0] = 0.0
+            self.network.outputs[1] = 0.0
+            self.network.outputs[2] = 0.0
+            self.network.outputs[3] = 0.0
+            self.network.outputs[4] = 0.0
+            self.network.outputs[5] = 0.0
+            self.network.outputs[6] = 0.0
+            self.network.outputs[7] = 0.0
+            self.network.outputs[8] = 0.0
+            self.network.outputs[9] = 0.0
             # Only record the outputs (last self.output_size values)
-            self.hist_outputs.append(self.network.outputs[-self.output_size:])
-        
-        self.hist_outputs = np.asarray(self.hist_outputs)
+
+        # # Debugging code to print the weights to check connections
+        # # Will scale with network size
+        # # First, convert to a dense array
+        # dense_weights = self.network.weights.toarray()
+
+        # # Now, iterate and print each element in (row, column) format
+        # for i in range(dense_weights.shape[0]):
+        #     for j in range(dense_weights.shape[1]):
+        #         print(f"({i}, {j}) {dense_weights[i, j]}")
+
+        self.final_outputs = self.network.outputs[-self.output_size:]
 
     def plot(self):
         # Plot oscillator output
