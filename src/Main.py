@@ -146,6 +146,4 @@ axs1[1].set_xlabel('Time Step')
 axs1[1].set_ylabel('Output Value')
 axs1[1].legend()
 
-plt.tight_layout()
-
 plt.show()

@@ -59,8 +59,8 @@ class Brain:
             self.network.outputs[7] = 0.0
             self.network.outputs[8] = 0.0
             self.network.outputs[9] = 0.0
-            self.input_history.append(network_inputs)
-            self.output_history.append(self.network.outputs)
+            self.input_history.append(network_inputs[:self.input_size])
+            self.output_history.append(self.network.outputs[-self.output_size:])
             # Only record the outputs (last self.output_size values)
 
         # # Debugging code to print the weights to check connections
