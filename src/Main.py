@@ -8,6 +8,7 @@ from scipy.sparse import csr_matrix
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 import functools
 
 import configparser
@@ -119,8 +120,32 @@ ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
 ax.legend()
+
+
+# Convert histories to numpy arrays for easier slicing and plotting
+input_history = np.array(best_agent.brain.input_history)
+output_history = np.array(best_agent.brain.output_history)
+
+# Creating subplots
+fig1, axs1 = plt.subplots(2, 1, figsize=(10, 6))
+fig1.suptitle('Best Agent Neural Network Inputs and Outputs Over Time')
+
+# Plotting Inputs
+axs1[0].set_title('Neural Network Inputs Over Time')
+for i in range(best_agent.brain.input_size):
+    axs1[0].plot(input_history[:, i], label=f'Input {i+1}')
+axs1[0].set_xlabel('Time Step')
+axs1[0].set_ylabel('Input Value')
+axs1[0].legend()
+
+# Plotting Outputs
+axs1[1].set_title('Neural Network Outputs Over Time')
+for i in range(best_agent.brain.output_size):
+    axs1[1].plot(output_history[:, i], label=f'Output {i+1}')
+axs1[1].set_xlabel('Time Step')
+axs1[1].set_ylabel('Output Value')
+axs1[1].legend()
+
+plt.tight_layout()
+
 plt.show()
-
-best_agent.brain.plot()
-
-

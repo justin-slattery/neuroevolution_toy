@@ -29,6 +29,8 @@ class Brain:
         self.step_size = step_size
         # Initializes the CTRNN
         self.network = CTRNN(size=self.net_size, step_size=self.step_size)
+        self.input_history = []
+        self.output_history = []
         self.final_outputs = []
         # Initializes the network
         self.network.randomize_outputs(0.1, 0.2)
@@ -57,6 +59,8 @@ class Brain:
             self.network.outputs[7] = 0.0
             self.network.outputs[8] = 0.0
             self.network.outputs[9] = 0.0
+            self.input_history.append(network_inputs)
+            self.output_history.append(self.network.outputs)
             # Only record the outputs (last self.output_size values)
 
         # # Debugging code to print the weights to check connections
@@ -70,14 +74,6 @@ class Brain:
         #         print(f"({i}, {j}) {dense_weights[i, j]}")
 
         self.final_outputs = self.network.outputs[-self.output_size:]
-
-    def plot(self):
-        # Plot oscillator output
-        plt.plot(np.arange(0, self.run_duration, self.step_size), self.network.outputs[:,10])
-        plt.plot(np.arange(0, self.run_duration, self.step_size), self.network.outputs[:,11])
-        plt.xlabel('Time')
-        plt.ylabel('Neuron outputs')
-        plt.show()
 
 # brain = Brain()
 # # set value for network taus
