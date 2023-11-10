@@ -121,4 +121,6 @@ ax.set_zlabel('Z')
 ax.legend()
 plt.show()
 
+best_agent.brain.plot()
+
 

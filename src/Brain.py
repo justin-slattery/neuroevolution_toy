@@ -45,7 +45,7 @@ class Brain:
         for _ in range(int(self.run_duration / self.step_size)):
             self.network.euler_step(network_inputs)  # Pass the network inputs to the CTRNN
             # 11/7/2023
-            # Neuron has 13 neurons but only 3 outputs
+            # Neuron has 12 neurons but only 2 outputs
             # 0-9 are input neurons
             self.network.outputs[0] = 0.0
             self.network.outputs[1] = 0.0
@@ -73,8 +73,8 @@ class Brain:
 
     def plot(self):
         # Plot oscillator output
-        #plt.plot(np.arange(0, self.run_duration, self.step_size), self.hist_outputs[:,0])
-        #plt.plot(np.arange(0, self.run_duration, self.step_size), self.hist_outputs[:,1])
+        plt.plot(np.arange(0, self.run_duration, self.step_size), self.network.outputs[:,10])
+        plt.plot(np.arange(0, self.run_duration, self.step_size), self.network.outputs[:,11])
         plt.xlabel('Time')
         plt.ylabel('Neuron outputs')
         plt.show()
@@ -83,7 +83,7 @@ class Brain:
 # # set value for network taus
 # brain.network.taus = np.ones(brain.network.size)
 # print(brain.network.taus)
-# # set random value for network biases
+# # set random value for network biasesS
 # brain.network.biases = np.random.uniform(-1, 1, brain.network.size)
 # print(brain.network.biases)
 # # set random value for network weights
