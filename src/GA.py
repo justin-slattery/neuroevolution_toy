@@ -3,6 +3,8 @@ Main class for creating the Genetic Algorithm and its required components.
 '''
 from copy import deepcopy
 from Agent import Agent
+from multiprocessing import Pool
+import multiprocessing as mp
 import numpy as np
 
 class GeneticAlgorithm:
@@ -45,8 +47,18 @@ class GeneticAlgorithm:
             self.population.append(agent)
 
     def evaluate_fitness(self):
-        for i, agent in enumerate(self.population):
-            self.fitnesses[i] = self.fitness_function(agent)
+        # Number of cores/processors to use
+        num_cores = 6
+
+        # Create a multiprocessing pool using a context manager
+        with Pool(processes=num_cores) as pool:
+            # Map fitness_function to each agent in the population
+            # and convert the result to a NumPy array
+            self.fitnesses = np.array(pool.map(self.fitness_function, self.population))
+
+        # Single processing code for reference
+        # for i, agent in enumerate(self.population):
+        #     self.fitnesses[i] = self.fitness_function(agent)
         # Update best fitness and Agent
         max_fitness_idx = np.argmax(self.fitnesses)
         if self.fitnesses[max_fitness_idx] > self.best_fitness:

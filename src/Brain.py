@@ -29,8 +29,8 @@ class Brain:
         self.step_size = step_size
         # Initializes the CTRNN
         self.network = CTRNN(size=self.net_size, step_size=self.step_size)
-        self.input_history = np.zeros(((self.run_duration/self.step_size), self.input_size))
-        self.output_history = np.zeros(((self.run_duration/self.step_size), self.output_size))
+        self.input_history = np.zeros((int(self.run_duration/self.step_size), self.input_size))
+        self.output_history = np.zeros((int(self.run_duration/self.step_size), self.output_size))
         self.final_outputs = []
         # Initializes the network
         self.network.randomize_outputs(0.1, 0.2)
@@ -46,6 +46,7 @@ class Brain:
         # Step through network
         for step in range(int(self.run_duration / self.step_size)):
             self.network.euler_step(network_inputs)  # Pass the network inputs to the CTRNN
+            self.input_history[step, :] = network_inputs[:self.input_size]
             # 11/7/2023
             # Neuron has 12 neurons but only 2 outputs
             # 0-9 are input neurons
@@ -59,7 +60,6 @@ class Brain:
             self.network.outputs[7] = 0.0
             self.network.outputs[8] = 0.0
             self.network.outputs[9] = 0.0
-            self.input_history[step, :] = network_inputs[:self.input_size]
             self.output_history[step, :] = self.network.outputs[-self.output_size:]
             # Only record the outputs (last self.output_size values)
 
@@ -72,7 +72,8 @@ class Brain:
         # for i in range(dense_weights.shape[0]):
         #     for j in range(dense_weights.shape[1]):
         #         print(f"({i}, {j}) {dense_weights[i, j]}")
-
+        
+        # Record final (2) outputs to be fed back to Agent for movement
         self.final_outputs = self.network.outputs[-self.output_size:]
 
 # brain = Brain()

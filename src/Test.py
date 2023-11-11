@@ -80,6 +80,8 @@
 #             else:
 #                 c.weights[i, j] = [val for val in [random.uniform(-10.0, 10.0) for i in range(1)] if val !=0][0]
 
-for i in range(3):
-    for j in range(3):
-        print(i,j)
+# 8 logical processors on laptop
+# import multiprocessing
+
+# pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+# print(pool)
