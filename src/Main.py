@@ -92,7 +92,7 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 # Plot environment boundaries (assuming they are from -10 to 10 in X and Y)
-x_bounds, y_bounds = [-10, 10], [-10, 10]
+x_bounds, y_bounds = [-25, 25], [-25, 25]
 ax.plot([x_bounds[0], x_bounds[1], x_bounds[1], x_bounds[0], x_bounds[0]],
         [y_bounds[0], y_bounds[0], y_bounds[1], y_bounds[1], y_bounds[0]],
         [0, 0, 0, 0, 0], 'gray', linestyle='--')  # Flat square on the ground
@@ -121,29 +121,25 @@ ax.set_ylabel('Y')
 ax.set_zlabel('Z')
 ax.legend()
 
-
-# Convert histories to numpy arrays for easier slicing and plotting
-input_history = np.array(best_agent.brain.input_history)
-output_history = np.array(best_agent.brain.output_history)
-
+# Plotting NN Inputs and Outputs over Time
 # Creating subplots
 fig1, axs1 = plt.subplots(2, 1, figsize=(10, 6))
 fig1.suptitle('Best Agent Neural Network Inputs and Outputs Over Time')
 
 # Plotting Inputs
-axs1[0].set_title('Neural Network Inputs Over Time')
+axs1[0].set_title('Inputs')
 for i in range(best_agent.brain.input_size):
-    axs1[0].plot(input_history[:, i], label=f'Input {i+1}')
-axs1[0].set_xlabel('Time Step')
+    axs1[0].plot(best_agent.brain.input_history[:, i], label=f'Input {i+1}')
 axs1[0].set_ylabel('Input Value')
-axs1[0].legend()
+axs1[0].legend(loc='upper right')
 
 # Plotting Outputs
-axs1[1].set_title('Neural Network Outputs Over Time')
+axs1[1].set_title('Outputs')
 for i in range(best_agent.brain.output_size):
-    axs1[1].plot(output_history[:, i], label=f'Output {i+1}')
+    axs1[1].plot(best_agent.brain.output_history[:, i], label=f'Output {i+1}')
 axs1[1].set_xlabel('Time Step')
 axs1[1].set_ylabel('Output Value')
-axs1[1].legend()
+axs1[1].legend(loc='upper right')
 
+plt.tight_layout()
 plt.show()

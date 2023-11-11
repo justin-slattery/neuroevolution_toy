@@ -16,7 +16,7 @@ HORIZONTAL_RAYS         =       int(config['DEFAULT']['HORIZONTAL_RAYS'])
 THRESHOLD               =       float(config['DEFAULT']['THRESHOLD'])
 
 class Agent:
-    def __init__(self, brain=None, initial_position=np.random.uniform(-10, 10, size=3), initial_heading=np.random.uniform(0, 2*math.pi)):
+    def __init__(self, brain=None, initial_position=np.random.uniform(-25, 25, size=3), initial_heading=np.random.uniform(0, 2*math.pi)):
         if brain is None:
             self.brain = Brain()  # Initialize a new Brain if one isn't provided
         else:
