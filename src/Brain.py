@@ -31,11 +31,11 @@ class Brain:
         self.network = CTRNN(size=self.net_size, step_size=self.step_size)
         # Initializes the input and output history
         # List version
-        # self.input_history = []
-        # self.output_history = []
+        self.input_history = []
+        self.output_history = []
         # Array version
-        self.input_history = np.zeros((int(self.run_duration/self.step_size), self.input_size))
-        self.output_history = np.zeros((int(self.run_duration/self.step_size), self.output_size))
+        # self.input_history = np.zeros((int(self.run_duration/self.step_size), self.input_size))
+        # self.output_history = np.zeros((int(self.run_duration/self.step_size), self.output_size))
         self.final_outputs = []
         # Initializes the network
         self.network.randomize_outputs(0.1, 0.2)
@@ -66,17 +66,13 @@ class Brain:
             self.network.outputs[9] = 0.0
         
             # # List version
-            # self.input_history.append(network_inputs)
-            # self.output_history.append(self.network.outputs)
+            self.input_history.append(network_inputs[:self.input_size])
+            self.output_history.append(self.network.outputs[-self.output_size:])
                 
-            # # Array version
-            # # Record inputs
             # # Check if any input value is non-zero and print
             # if np.any(external_inputs):
             #     print(f"Step {step}: Non-zero Inputs - {external_inputs}")
-            self.input_history[step, :] = external_inputs
-            self.output_history[step, :] = self.network.outputs[-self.output_size:]
-        
+
         # Record final (2) outputs to be fed back to Agent for movement
         self.final_outputs = self.network.outputs[-self.output_size:]
 

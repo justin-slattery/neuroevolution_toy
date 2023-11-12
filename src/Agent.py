@@ -18,22 +18,27 @@ ENV_SIZE                =       float(config['DEFAULT']['ENV_SIZE'])
 
 
 class Agent:
-    def __init__(self, brain=None, initial_position=np.random.uniform(-ENV_SIZE, ENV_SIZE, size=3), initial_heading=np.random.uniform(0, 2*math.pi)):
+    def __init__(self, brain=None, initial_position=None, initial_heading=None):
         if brain is None:
             self.brain = Brain()  # Initialize a new Brain if one isn't provided
         else:
             self.brain = brain  # Use the provided Brain instance
         
+        if initial_position is None:
+            initial_position = np.random.uniform(-ENV_SIZE, ENV_SIZE, size=3)
         initial_position[2] = 0  # Set z-axis to 0
         self.position = np.array(initial_position)  # Similar to Unity's Transform component
+
         self.ray_caster = RayCaster3D(position=self.position,
                                       horizontal_fov=np.radians(HORIZONTAL_FOV), 
                                       max_distance=MAX_DISTANCE, 
                                       horizontal_rays=HORIZONTAL_RAYS)
         self.trajectory = [self.position.tolist()]  # Store the initial position
+
+        if initial_heading is None:
+            initial_heading = np.random.uniform(0, 2 * math.pi)
         self.heading = initial_heading
         self.has_reached_target = False
-
 
     def is_within_bounds(self, position):
             # Define bounds, could be based on the same values used to initialize position randomly

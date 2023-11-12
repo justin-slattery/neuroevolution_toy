@@ -100,25 +100,23 @@ def plot_trajectory(agent_trajectory, target_position):
     ax.legend()
 
 def plot_nn_io(best_agent):
-    # input_history = np.array(best_agent.brain.input_history)
-    # output_history = np.array(best_agent.brain.output_history)
+    input_history = np.array(best_agent.brain.input_history)
+    output_history = np.array(best_agent.brain.output_history)
     
     fig, axs = plt.subplots(2, 1, figsize=(10, 6))
     fig.suptitle('Best Agent Neural Network Inputs and Outputs Over Time')
 
     axs[0].set_title('Inputs')
     for i in range(best_agent.brain.input_size):
-        axs[0].plot(best_agent.brain.input_history[:, i], label=f'Input {i+1}')
+        axs[0].plot(input_history[:, i], label=f'Input {i+1}')
     axs[0].set_ylabel('Input Value')
-    axs[0].set_ylim(0, best_agent.brain.input_history.max())  # Set y-axis limits
     axs[0].legend(loc='upper left', bbox_to_anchor=(1, 1))
 
     axs[1].set_title('Outputs')
     for i in range(best_agent.brain.output_size):
-        axs[1].plot(best_agent.brain.output_history[:, i], label=f'Output {i+1}')
+        axs[1].plot(output_history[:, i], label=f'Output {i+1}')
     axs[1].set_xlabel('Time Step')
     axs[1].set_ylabel('Output Value')
-    axs[1].set_ylim(0, best_agent.brain.output_history.max())  # Set y-axis limits
     axs[1].legend(loc='upper left', bbox_to_anchor=(1, 1))
 
     plt.tight_layout()
