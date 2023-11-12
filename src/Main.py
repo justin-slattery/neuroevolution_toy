@@ -16,14 +16,15 @@ import configparser
 config = configparser.ConfigParser()
 config.read("./config.ini")
 
-POPULATION_SIZE         =       int(config['DEFAULT']['POPULATION_SIZE'])
-GENERATIONS             =       int(config['DEFAULT']['GENERATIONS'])
+THRESHOLD               =       float(config['DEFAULT']['THRESHOLD'])
+ENV_SIZE                =       float(config['DEFAULT']['ENV_SIZE'])
+STEP_SIZE               =       float(config['DEFAULT']['STEP_SIZE'])
 MUTATION_PROBABILITY    =       float(config['DEFAULT']['MUTATION_PROBABILITY'])
 MUTATION_STRENGTH       =       float(config['DEFAULT']['MUTATION_STRENGTH'])
 ELITISM_FRACTION        =       float(config['DEFAULT']['ELITISM_FRACTION'])
 RUN_DURATION            =       int(config['DEFAULT']['RUN_DURATION'])
-THRESHOLD               =       float(config['DEFAULT']['THRESHOLD'])
-STEP_SIZE               =       float(config['DEFAULT']['STEP_SIZE'])
+GENERATIONS             =       int(config['DEFAULT']['GENERATIONS'])
+POPULATION_SIZE         =       int(config['DEFAULT']['POPULATION_SIZE'])
 DATA_DIR                =       str(config['DEFAULT']['DATA_DIR'])
 
 def format_time(seconds):
@@ -69,6 +70,60 @@ def fitness_function(agent, target):
     
     return fitness
 
+def plot_trajectory(agent_trajectory, target_position):
+    trajectory = np.array(agent_trajectory)  # Convert to numpy array for easy slicing
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Plot environment boundaries
+    x_bounds, y_bounds = [-ENV_SIZE, ENV_SIZE], [-ENV_SIZE, ENV_SIZE]
+    ax.plot([x_bounds[0], x_bounds[1], x_bounds[1], x_bounds[0], x_bounds[0]],
+            [y_bounds[0], y_bounds[0], y_bounds[1], y_bounds[1], y_bounds[0]],
+            [0, 0, 0, 0, 0], 'gray', linestyle='--')
+
+    # Plot the trajectory as a line
+    ax.plot(trajectory[:, 0], trajectory[:, 1], trajectory[:, 2], label='Agent Path')
+    ax.scatter(trajectory[0, 0], trajectory[0, 1], trajectory[0, 2], color='k', s=50, label='Start')
+    ax.scatter(*target_position, color='r', s=50, label='Target')
+
+    if len(trajectory) > 1:
+        direction = trajectory[-1] - trajectory[-2]
+        direction = direction / np.linalg.norm(direction)
+        ax.quiver(trajectory[-1, 0], trajectory[-1, 1], trajectory[-1, 2],
+                  direction[0], direction[1], direction[2],
+                  length=0.25, normalize=True, color='black', arrow_length_ratio=0.05)
+
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.legend()
+
+def plot_nn_io(best_agent):
+    # input_history = np.array(best_agent.brain.input_history)
+    # output_history = np.array(best_agent.brain.output_history)
+    
+    fig, axs = plt.subplots(2, 1, figsize=(10, 6))
+    fig.suptitle('Best Agent Neural Network Inputs and Outputs Over Time')
+
+    axs[0].set_title('Inputs')
+    for i in range(best_agent.brain.input_size):
+        axs[0].plot(best_agent.brain.input_history[:, i], label=f'Input {i+1}')
+    axs[0].set_ylabel('Input Value')
+    axs[0].set_ylim(0, best_agent.brain.input_history.max())  # Set y-axis limits
+    axs[0].legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+    axs[1].set_title('Outputs')
+    for i in range(best_agent.brain.output_size):
+        axs[1].plot(best_agent.brain.output_history[:, i], label=f'Output {i+1}')
+    axs[1].set_xlabel('Time Step')
+    axs[1].set_ylabel('Output Value')
+    axs[1].set_ylim(0, best_agent.brain.output_history.max())  # Set y-axis limits
+    axs[1].legend(loc='upper left', bbox_to_anchor=(1, 1))
+
+    plt.tight_layout()
+    plt.subplots_adjust(right=0.8)
+
 def main():
     # Initialize the target
     target = Target()
@@ -104,66 +159,14 @@ def main():
     print(f"Simulation and GA took {formatted_time} to complete.")
 
     if best_agent.has_reached_target:
-        # Plot the best trajectory using the trajectory data from the best agent
-        trajectory = np.array(best_agent.trajectory)  # Convert to numpy array for easy slicing
+        #print("Input History:", best_agent.brain.input_history)
+        # Plotting the trajectory
+        plot_trajectory(best_agent.trajectory, target.position)
 
-        # Create a 3D plot
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-
-        # Plot environment boundaries (assuming they are from -10 to 10 in X and Y)
-        x_bounds, y_bounds = [-25, 25], [-25, 25]
-        ax.plot([x_bounds[0], x_bounds[1], x_bounds[1], x_bounds[0], x_bounds[0]],
-                [y_bounds[0], y_bounds[0], y_bounds[1], y_bounds[1], y_bounds[0]],
-                [0, 0, 0, 0, 0], 'gray', linestyle='--')  # Flat square on the ground
-
-        # Plot the trajectory as a line
-        ax.plot(trajectory[:, 0], trajectory[:, 1], trajectory[:, 2], label='Agent Path')
-        # Add a black dot at the starting point
-        ax.scatter(trajectory[0, 0], trajectory[0, 1], trajectory[0, 2], color='k', s=50, label='Start')
-        # Add a red dot for the target's position
-        ax.scatter(*target.position, color='r', s=50, label='Target')
-
-        # If the trajectory has at least two points, add an arrow for the direction
-        if len(trajectory) > 1:
-            # Calculate the direction vector for the arrow from the last two points
-            direction = trajectory[-1] - trajectory[-2]
-            # Normalize the direction vector
-            direction = direction / np.linalg.norm(direction)
-            # Plot the arrow using quiver
-            # The arrow will start at the last point of the trajectory and point backwards
-            ax.quiver(trajectory[-1, 0], trajectory[-1, 1], trajectory[-1, 2],
-                    direction[0], direction[1], direction[2],
-                    length=0.25, normalize=True, color='black', arrow_length_ratio=0.05)
-
-        ax.set_xlabel('X')
-        ax.set_ylabel('Y')
-        ax.set_zlabel('Z')
-        ax.legend()
-
-        # Plotting NN Inputs and Outputs over Time
-        # Creating subplots
-        fig1, axs1 = plt.subplots(2, 1, figsize=(10, 6))
-        fig1.suptitle('Best Agent Neural Network Inputs and Outputs Over Time')
-
-        # Plotting Inputs
-        axs1[0].set_title('Inputs')
-        for i in range(best_agent.brain.input_size):
-            axs1[0].plot(best_agent.brain.input_history[:, i], label=f'Input {i+1}')
-        axs1[0].set_ylabel('Input Value')
-        axs1[0].legend(loc='upper left', bbox_to_anchor=(1, 1))
-
-        # Plotting Outputs
-        axs1[1].set_title('Outputs')
-        for i in range(best_agent.brain.output_size):
-            axs1[1].plot(best_agent.brain.output_history[:, i], label=f'Output {i+1}')
-        axs1[1].set_xlabel('Time Step')
-        axs1[1].set_ylabel('Output Value')
-        axs1[1].legend(loc='upper left', bbox_to_anchor=(1, 1))
-        plt.tight_layout()
-        plt.subplots_adjust(right=0.8)
-
+        # Plotting the NN Inputs and Outputs over Time
+        plot_nn_io(best_agent)
         plt.show()
+
     else:
         print("Agent did not reach the target. No plots generated.")
 

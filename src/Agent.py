@@ -14,9 +14,11 @@ MAX_DISTANCE            =       float(config['DEFAULT']['MAX_DISTANCE'])
 HORIZONTAL_FOV          =       float(config['DEFAULT']['HORIZONTAL_FOV'])
 HORIZONTAL_RAYS         =       int(config['DEFAULT']['HORIZONTAL_RAYS'])
 THRESHOLD               =       float(config['DEFAULT']['THRESHOLD'])
+ENV_SIZE                =       float(config['DEFAULT']['ENV_SIZE'])
+
 
 class Agent:
-    def __init__(self, brain=None, initial_position=np.random.uniform(-25, 25, size=3), initial_heading=np.random.uniform(0, 2*math.pi)):
+    def __init__(self, brain=None, initial_position=np.random.uniform(-ENV_SIZE, ENV_SIZE, size=3), initial_heading=np.random.uniform(0, 2*math.pi)):
         if brain is None:
             self.brain = Brain()  # Initialize a new Brain if one isn't provided
         else:
@@ -37,7 +39,7 @@ class Agent:
             # Define bounds, could be based on the same values used to initialize position randomly
             # Currently hard set to match initial_position vector
             # Will change when z-axis is introduced
-            bounds = np.array([[-10, 10], [-10, 10], [0, 0]])
+            bounds = np.array([[-ENV_SIZE, ENV_SIZE], [-ENV_SIZE, ENV_SIZE], [0, 0]])
             return np.all((position >= bounds[:, 0]) & (position <= bounds[:, 1]))
 
     def update(self, target_position):

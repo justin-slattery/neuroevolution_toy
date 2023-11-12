@@ -29,6 +29,11 @@ class Brain:
         self.step_size = step_size
         # Initializes the CTRNN
         self.network = CTRNN(size=self.net_size, step_size=self.step_size)
+        # Initializes the input and output history
+        # List version
+        # self.input_history = []
+        # self.output_history = []
+        # Array version
         self.input_history = np.zeros((int(self.run_duration/self.step_size), self.input_size))
         self.output_history = np.zeros((int(self.run_duration/self.step_size), self.output_size))
         self.final_outputs = []
@@ -39,14 +44,13 @@ class Brain:
         # Ensure external_inputs is only for input neurons
         if len(external_inputs) != self.input_size:
             raise ValueError(f"Expected external inputs of length {self.input_size}, got {len(external_inputs)}")
-
+        
         # Append zero values for output neurons since they are not driven by external inputs
         network_inputs = np.concatenate((external_inputs, np.zeros(self.output_size)))
 
         # Step through network
         for step in range(int(self.run_duration / self.step_size)):
             self.network.euler_step(network_inputs)  # Pass the network inputs to the CTRNN
-            self.input_history[step, :] = network_inputs[:self.input_size]
             # 11/7/2023
             # Neuron has 12 neurons but only 2 outputs
             # 0-9 are input neurons
@@ -60,8 +64,21 @@ class Brain:
             self.network.outputs[7] = 0.0
             self.network.outputs[8] = 0.0
             self.network.outputs[9] = 0.0
+        
+            # # List version
+            # self.input_history.append(network_inputs)
+            # self.output_history.append(self.network.outputs)
+                
+            # # Array version
+            # # Record inputs
+            # # Check if any input value is non-zero and print
+            # if np.any(external_inputs):
+            #     print(f"Step {step}: Non-zero Inputs - {external_inputs}")
+            self.input_history[step, :] = external_inputs
             self.output_history[step, :] = self.network.outputs[-self.output_size:]
-            # Only record the outputs (last self.output_size values)
+        
+        # Record final (2) outputs to be fed back to Agent for movement
+        self.final_outputs = self.network.outputs[-self.output_size:]
 
         # # Debugging code to print the weights to check connections
         # # Will scale with network size
@@ -73,8 +90,6 @@ class Brain:
         #     for j in range(dense_weights.shape[1]):
         #         print(f"({i}, {j}) {dense_weights[i, j]}")
         
-        # Record final (2) outputs to be fed back to Agent for movement
-        self.final_outputs = self.network.outputs[-self.output_size:]
 
 # brain = Brain()
 # # set value for network taus

@@ -48,7 +48,7 @@ class GeneticAlgorithm:
 
     def evaluate_fitness(self):
         # Number of cores/processors to use
-        num_cores = 6
+        num_cores = 8
 
         # Create a multiprocessing pool using a context manager
         with Pool(processes=num_cores) as pool:
@@ -89,7 +89,10 @@ class GeneticAlgorithm:
         return agent
 
     def create_next_generation(self, elites):
+        if not elites:  # If elites list is empty
+            elites = [deepcopy(self.best_individual)]  # Use the best individual
         next_generation = deepcopy(elites)
+        
         while len(next_generation) < self.population_size:
             elite_clone = deepcopy(np.random.choice(elites))
             mutated_clone = self.mutate(elite_clone)
@@ -107,7 +110,7 @@ class GeneticAlgorithm:
             self.evaluate_fitness()
             elites = self.fitness_proportionate_selection()
             self.create_next_generation(elites)
-            print(f"Generation {generation}: Best Fitness = {self.best_fitness}")
+            print(f"Generation {generation+1}: Best Fitness = {self.best_fitness}")
         # Return the best Brain found after all generations
         return self.best_individual
 
