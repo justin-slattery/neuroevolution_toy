@@ -34,10 +34,11 @@ class RayCaster3D:
         return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
     def cast_rays(self, target_position):
+        # Initialize distances to indicate no detection
+        distances = np.zeros(self.horizontal_rays)
         # Cast rays towards the target and determine if they hit
         hits = np.zeros(self.horizontal_rays, dtype=bool)
-        # Initialize distances to zero to indicate no detection
-        distances = np.zeros(self.horizontal_rays)
+
         target_vector = target_position - self.position
         target_distance = np.linalg.norm(target_vector)
 
@@ -47,9 +48,9 @@ class RayCaster3D:
                 angle_diff = self.angle_between(target_vector, ray_direction)
                 if angle_diff <= np.radians(self.horizontal_fov / 2):
                     hits[j] = True
-                    # Normalize distance to [0, 1]
                     distances[j] = target_distance / self.max_distance
 
+        # Return both hits and distances
         return hits, distances
 
 

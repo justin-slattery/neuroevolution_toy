@@ -19,8 +19,8 @@ class Brain:
     def __init__(self, run_duration=RUN_DURATION, step_size=STEP_SIZE, num_rays=HORIZONTAL_RAYS, num_outputs=NUM_OUTPUTS):
         # Sets the simulation run duration
         self.run_duration = run_duration
-        # Sets the number of input neurons based on rays (distance and hit/miss for each ray)
-        self.input_size = 2 * num_rays
+        # Sets the number of input neurons based on rays (distance for each ray, only triggered on a hit)
+        self.input_size = num_rays
         # Sets the number of output neurons (x, y, z positioning)
         self.output_size = num_outputs
         # Total network size includes both input neurons and other neurons
@@ -51,19 +51,14 @@ class Brain:
         # Step through network
         for step in range(int(self.run_duration / self.step_size)):
             self.network.euler_step(network_inputs)  # Pass the network inputs to the CTRNN
-            # 11/7/2023
-            # Neuron has 12 neurons but only 2 outputs
-            # 0-9 are input neurons
+            # 11/13/2023
+            # Neuron has 7 neurons but only 2 outputs
+            # 0-4 are input neurons
             self.network.outputs[0] = 0.0
             self.network.outputs[1] = 0.0
             self.network.outputs[2] = 0.0
             self.network.outputs[3] = 0.0
             self.network.outputs[4] = 0.0
-            self.network.outputs[5] = 0.0
-            self.network.outputs[6] = 0.0
-            self.network.outputs[7] = 0.0
-            self.network.outputs[8] = 0.0
-            self.network.outputs[9] = 0.0
         
             # # List version
             self.input_history.append(network_inputs[:self.input_size])
@@ -72,7 +67,6 @@ class Brain:
             # # Check if any input value is non-zero and print
             # if np.any(external_inputs):
             #     print(f"Step {step}: Non-zero Inputs - {external_inputs}")
-
         # Record final (2) outputs to be fed back to Agent for movement
         self.final_outputs = self.network.outputs[-self.output_size:]
 

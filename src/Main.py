@@ -102,6 +102,9 @@ def plot_trajectory(agent_trajectory, target_position):
 def plot_nn_io(best_agent):
     input_history = np.array(best_agent.brain.input_history)
     output_history = np.array(best_agent.brain.output_history)
+
+    print("Input history shape:", np.array(best_agent.brain.input_history).shape)
+    print("Output history shape:", np.array(best_agent.brain.output_history).shape)
     
     fig, axs = plt.subplots(2, 1, figsize=(10, 6))
     fig.suptitle('Best Agent Neural Network Inputs and Outputs Over Time')

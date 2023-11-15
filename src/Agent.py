@@ -59,14 +59,24 @@ class Agent:
         # Use ray caster to 'observe' the target
         hits, distances = self.ray_caster.cast_rays(target_position)
 
-        # Combine ray cast information with any other inputs your brain needs
-        sensory_inputs = np.concatenate((distances, hits.astype(float)))
+        # Prepare sensory inputs
+        if hits.any():
+            # Use distances as inputs only where hits are True
+            sensory_inputs = np.where(hits, distances, 0)
+        else:
+            # Define default sensory inputs when no hits are detected
+            sensory_inputs = np.zeros(self.brain.input_size)  # No detection
 
-        # Pass sensory inputs to the brain for processing
+        # Pass the prepared sensory inputs to the brain
         self.brain.step(sensory_inputs)
 
         # New brain output handling
-        forward_velocity, turning_angle = self.brain.final_outputs[:2]  # Assume the brain provides a forward velocity and a turning angle
+        if self.brain.final_outputs.any():
+            forward_velocity, turning_angle = self.brain.final_outputs[:2]
+        else:
+            # Default action if no output is generated
+            forward_velocity = 0.05  # Small forward velocity
+            turning_angle = np.random.uniform(-0.25, 0.25)  # Random small turning angle
         
         # Update the heading
         self.heading += turning_angle
