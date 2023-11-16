@@ -1,6 +1,7 @@
 '''
 Main class for running the genetic algorithm, the simulation, and recording/plotting the results.
 '''
+from audioop import mul
 from GA import GeneticAlgorithm
 from Agent import Agent
 from Target import Target
@@ -22,10 +23,12 @@ STEP_SIZE               =       float(config['DEFAULT']['STEP_SIZE'])
 MUTATION_PROBABILITY    =       float(config['DEFAULT']['MUTATION_PROBABILITY'])
 MUTATION_STRENGTH       =       float(config['DEFAULT']['MUTATION_STRENGTH'])
 ELITISM_FRACTION        =       float(config['DEFAULT']['ELITISM_FRACTION'])
+NUM_CORES               =       int(config['DEFAULT']['NUM_CORES'])
 RUN_DURATION            =       int(config['DEFAULT']['RUN_DURATION'])
 GENERATIONS             =       int(config['DEFAULT']['GENERATIONS'])
 POPULATION_SIZE         =       int(config['DEFAULT']['POPULATION_SIZE'])
 DATA_DIR                =       str(config['DEFAULT']['DATA_DIR'])
+MULTI_PROCESSING        =       config['DEFAULT'].getboolean('MULTI_PROCESSING')
 
 def format_time(seconds):
     """Converts a time in seconds to a string format: hours, minutes, seconds."""
@@ -103,8 +106,8 @@ def plot_nn_io(best_agent):
     input_history = np.array(best_agent.brain.input_history)
     output_history = np.array(best_agent.brain.output_history)
 
-    print("Input history shape:", np.array(best_agent.brain.input_history).shape)
-    print("Output history shape:", np.array(best_agent.brain.output_history).shape)
+    # print("Input history shape:", np.array(best_agent.brain.input_history).shape)
+    # print("Output history shape:", np.array(best_agent.brain.output_history).shape)
     
     fig, axs = plt.subplots(2, 1, figsize=(10, 6))
     fig.suptitle('Best Agent Neural Network Inputs and Outputs Over Time')
@@ -126,6 +129,11 @@ def plot_nn_io(best_agent):
     plt.subplots_adjust(right=0.8)
 
 def main():
+    if MULTI_PROCESSING:
+        print("Utiliizing multi-processing. Compute resources maximized. \n")
+    else:
+        print("Not utilizing multi-processing. Evaluation will be slower. \n")
+    
     # Initialize the target
     target = Target()
 
@@ -135,7 +143,9 @@ def main():
         population_size=POPULATION_SIZE,
         mutation_prob=MUTATION_PROBABILITY,
         mutation_strength=MUTATION_STRENGTH,
-        elitism_fraction=ELITISM_FRACTION
+        elitism_fraction=ELITISM_FRACTION,
+        multi_processing=MULTI_PROCESSING,
+        num_cores=NUM_CORES
     )
 
     start_time = time.time()

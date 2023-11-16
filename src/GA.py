@@ -8,11 +8,14 @@ import multiprocessing as mp
 import numpy as np
 
 class GeneticAlgorithm:
-    def __init__(self, fitness_function, population_size, mutation_prob, mutation_strength, elitism_fraction):
+    def __init__(self, fitness_function, population_size, mutation_prob,
+                 mutation_strength, elitism_fraction, multi_processing, num_cores):
         self.population_size = population_size
         self.mutation_prob = mutation_prob
         self.mutation_strength = mutation_strength
         self.elite_size = int(elitism_fraction * population_size)
+        self.multi_processing = multi_processing
+        self.num_cores = num_cores
         self.population = []  # Initialize the population with Agent objects
         self.fitness_function = fitness_function  # Fitness function that evaluates an Agent
         self.fitnesses = np.zeros(population_size)
@@ -47,18 +50,18 @@ class GeneticAlgorithm:
             self.population.append(agent)
 
     def evaluate_fitness(self):
-        # Number of cores/processors to use
-        num_cores = 8
+        # Checks if multi-processing is enabled
+        if self.multi_processing:
+            # Create a multiprocessing pool using a context manager
+            with Pool(processes=self.num_cores) as pool:
+                # Map fitness_function to each agent in the population
+                # and convert the result to a NumPy array
+                self.fitnesses = np.array(pool.map(self.fitness_function, self.population))
+        else:
+            # Single processing
+            for i, agent in enumerate(self.population):
+                self.fitnesses[i] = self.fitness_function(agent)
 
-        # Create a multiprocessing pool using a context manager
-        with Pool(processes=num_cores) as pool:
-            # Map fitness_function to each agent in the population
-            # and convert the result to a NumPy array
-            self.fitnesses = np.array(pool.map(self.fitness_function, self.population))
-
-        # Single processing code for reference
-        # for i, agent in enumerate(self.population):
-        #     self.fitnesses[i] = self.fitness_function(agent)
         # Update best fitness and Agent
         max_fitness_idx = np.argmax(self.fitnesses)
         if self.fitnesses[max_fitness_idx] > self.best_fitness:

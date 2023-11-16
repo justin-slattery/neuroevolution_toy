@@ -25,7 +25,7 @@ class Agent:
             self.brain = brain  # Use the provided Brain instance
         
         if initial_position is None:
-            initial_position = np.random.uniform(-ENV_SIZE, ENV_SIZE, size=3)
+            initial_position = np.random.uniform(ENV_SIZE/2, ENV_SIZE, size=3)
         initial_position[2] = 0  # Set z-axis to 0
         self.position = np.array(initial_position)  # Similar to Unity's Transform component
 
@@ -76,7 +76,7 @@ class Agent:
         else:
             # Default action if no output is generated
             forward_velocity = 0.05  # Small forward velocity
-            turning_angle = np.random.uniform(-0.25, 0.25)  # Random small turning angle
+            turning_angle = np.random.uniform(-0.15, 0.15)  # Random small turning angle
         
         # Update the heading
         self.heading += turning_angle

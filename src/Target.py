@@ -12,7 +12,7 @@ ENV_SIZE                =       float(config['DEFAULT']['ENV_SIZE'])
 class Target:
     def __init__(self, initial_position=None):
         if initial_position is None:
-            initial_position = np.random.uniform(-ENV_SIZE, ENV_SIZE, size=3)
+            initial_position = np.random.uniform(-ENV_SIZE, -ENV_SIZE/2, size=3)
         initial_position[2] = 0  # Assuming Z-axis should be 0
         self.position = np.array(initial_position)
     
